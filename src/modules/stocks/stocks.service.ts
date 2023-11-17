@@ -38,8 +38,36 @@ export class StocksService {
     return stocksIterator().then(() => promises);
   }
 
-  findOne(id: string) {
-    return;
+  async findHistory({ ids, range, interval }) {
+    const idsString = ids.split(',');
+    // run an await loop over the idsString array and each loop has 10 elements
+    const promises = [];
+
+    const asyncIterator = (async function* () {
+      // returns 10 elements at a time
+      for (let i = 0; i < idsString.length; i += 10) {
+        const ids = idsString.slice(i, i + 10);
+        yield ids;
+      }
+    })();
+    const stocksIterator = async () => {
+      for await (const value of asyncIterator) {
+        const response = await firstValueFrom(
+          this.httpService.get(
+            `${this.API}/quote/${value}?range=${range}&interval=${interval}&token=${this.TOKEN}`,
+          ),
+        );
+        promises.push(response.data);
+      }
+    };
+    return stocksIterator().then(() => promises);
+  }
+
+  async findOne(id: string) {
+    const response = await firstValueFrom(
+      this.httpService.get(`${this.API}/quote/${id}?token=${this.TOKEN}`),
+    );
+    return response.data;
   }
 
   findDividends(id: string) {
