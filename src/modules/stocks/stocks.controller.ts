@@ -1,5 +1,7 @@
-import { Controller, Get, Param } from '@nestjs/common';
+import { Controller, Get, Param, Query } from '@nestjs/common';
 import { StocksService } from './stocks.service';
+import { Interval } from './types/interval';
+import { Range } from './types/range';
 
 @Controller('stocks')
 export class StocksController {
@@ -8,6 +10,17 @@ export class StocksController {
   @Get('/:ids')
   findAll(@Param('ids') ids: string) {
     return this.stocksService.findAll(ids);
+  }
+
+  @Get('history/:ids?')
+  findHistory(
+    @Param('ids') ids: string,
+    @Query('range')
+    range: Range,
+    @Query('interval')
+    interval: Interval,
+  ) {
+    return this.stocksService.findHistory({ ids, range, interval });
   }
 
   @Get('/:id')
