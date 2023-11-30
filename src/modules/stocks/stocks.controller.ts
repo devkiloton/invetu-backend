@@ -28,9 +28,9 @@ export class StocksController {
     return this.stocksService.findOne(id);
   }
 
-  @Get('dividends/:id')
-  findDividends(@Param('id') id: string) {
-    return this.stocksService.findDividends(id);
+  @Get('dividends/:ids')
+  findDividends(@Param('ids') ids: string) {
+    return this.stocksService.findDividends(ids);
   }
 
   @Get('fuzzy/:id')
