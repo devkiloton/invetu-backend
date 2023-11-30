@@ -84,9 +84,6 @@ export class StocksService {
     })();
     const stocksIterator = async () => {
       for await (const value of asyncIterator) {
-        console.log(
-          `${this.API}/quote/${value}?range=ytd&interval=1d&token=${this.TOKEN}`,
-        );
         const response = await firstValueFrom(
           this.httpService.get(
             `${this.API}/quote/${value}?range=1y&interval=3mo&dividends=true&token=${this.TOKEN}`,
