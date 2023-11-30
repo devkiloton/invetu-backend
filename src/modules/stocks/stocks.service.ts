@@ -20,8 +20,8 @@ export class StocksService {
 
     const asyncIterator = (async function* () {
       // returns 10 elements at a time
-      for (let i = 0; i < idsString.length; i += 10) {
-        const ids = idsString.slice(i, i + 10);
+      for (let i = 0; i < idsString.length; i += 20) {
+        const ids = idsString.slice(i, i + 20);
         yield ids;
       }
     })();
@@ -45,8 +45,8 @@ export class StocksService {
 
     const asyncIterator = (async function* () {
       // returns 10 elements at a time
-      for (let i = 0; i < idsString.length; i += 10) {
-        const ids = idsString.slice(i, i + 10);
+      for (let i = 0; i < idsString.length; i += 20) {
+        const ids = idsString.slice(i, i + 20);
         yield ids;
       }
     })();
@@ -70,8 +70,32 @@ export class StocksService {
     return response.data;
   }
 
-  findDividends(id: string) {
-    return;
+  async findDividends(ids: string) {
+    const idsString = ids.split(',');
+    // run an await loop over the idsString array and each loop has 10 elements
+    const promises = [];
+
+    const asyncIterator = (async function* () {
+      // returns 10 elements at a time
+      for (let i = 0; i < idsString.length; i += 20) {
+        const ids = idsString.slice(i, i + 20);
+        yield ids;
+      }
+    })();
+    const stocksIterator = async () => {
+      for await (const value of asyncIterator) {
+        console.log(
+          `${this.API}/quote/${value}?range=ytd&interval=1d&token=${this.TOKEN}`,
+        );
+        const response = await firstValueFrom(
+          this.httpService.get(
+            `${this.API}/quote/${value}?range=1y&interval=3mo&dividends=true&token=${this.TOKEN}`,
+          ),
+        );
+        promises.push(response.data);
+      }
+    };
+    return stocksIterator().then(() => promises);
   }
 
   async findFuzzy(id: string): Promise<FuzzyAPI> {
